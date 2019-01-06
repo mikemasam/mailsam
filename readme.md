@@ -18,3 +18,17 @@
   -connect to sql
   -write from object to sql
 
+-Libraries
+  -SQL library
+  -Run as a service library
+  -Email library
+  -Flags library
+
+Tasks Ranking
+->Deamon
+->Linux service flug library
+->SQL library
+->Mail Library
+
+
+

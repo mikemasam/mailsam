@@ -4,7 +4,7 @@
 using namespace std;
 
 int main(int ac, char** av){
-  std::cout << "Hi" << std::endl;
+  std::cout << "Starting up" << std::endl;
   Options op;
   if(!op.init(ac,av)){
     return 0;

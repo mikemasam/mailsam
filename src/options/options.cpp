@@ -13,7 +13,7 @@ bool Options::init(int ac, char** av){
   // Declare the supported options.
   this->options->add_options()
     ("h", "produce help message")
-    ("user,u",value<string>()->default_value("default user"), "full username");
+    ("value,v",value<string>()->default_value(""), "functional value");
 
   try {
     store(parse_command_line(ac, av, *this->options), vm);

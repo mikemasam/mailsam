@@ -3,9 +3,19 @@ APP_NAME = mailsam
 src = $(wildcard src/*.cpp src/**/*.cpp)
 obj = $(src:.cpp=.o)
 
-#$(ccsrc:.cc=.o)
+#$(ccsrc:.cc=.o)  
+sql_libs_s = -l:libmysqlclient.a -l:libmysqlcppconn-static.a
+sql_libs = -lmysqlcppconn
+boost_libs_s = -l:libboost_program_options.a -l:libboost_system.a -l:libboost_regex.a
+boost_libs = -lboost_program_options -lboost_system -lboost_regex
+libs = -l:libmailio.a -lcrypto -lssl 
+static = -static
+lib_dir = -Llibraries
 
-LDFLAGS = -lrt -lm -pthread -lboost_program_options -lmysqlcppconn
+
+LDFLAGS = -lrt -lm -pthread $(lib_dir) $(libs) $(sql_libs) $(boost_libs)  
+
+
 
 $(APP_NAME): $(obj)
 	    $(CXX) -o $@ $^ $(LDFLAGS)

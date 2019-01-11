@@ -13,7 +13,8 @@ bool Options::init(int ac, char** av){
   // Declare the supported options.
   this->options->add_options()
     ("h", "produce help message")
-    ("value,v",value<string>()->default_value(""), "functional value");
+    ("value,v",value<string>()->default_value(""), "functional value")
+    ("index,i",value<int>()->default_value(0), "functional value");
 
   try {
     store(parse_command_line(ac, av, *this->options), vm);
@@ -35,15 +36,18 @@ bool Options::hasValue(string name){
 }
 
 template<typename T>
-T Options::getValue(string name){
+T Options::getValue(string name,T default_value){
   if (this->hasValue(name)) {
     return this->vm[name].as<T>();
   } else {
-    return "not set";
+    return default_value;
   }
 }
 
 string Options::getStringValue(string name){
-  return this->getValue<string>(name);
+  return this->getValue<string>(name,"not set");
 }
 
+int Options::getIntValue(string name){
+  return this->getValue<int>(name,1);
+}

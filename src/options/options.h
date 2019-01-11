@@ -14,5 +14,5 @@ class Options {
     options_description *options;
     variables_map vm;
     template<typename T>
-    T getValue(string name);
+    T getValue(string name,T default_value);
 };

@@ -1,20 +1,22 @@
--Deamon
-  -run as a linux service
-  -read flugs from linux service manager
--Read Incoming Mails Async
+-Run in background
+  -run in background
+  -receive commands
+  -manage from remote network
+
+-Read Incoming Mails Async - Done
   -connect to provider and authenticate
   -read new emails
   -compile
   -save to sql
--Send outgoing Mails Async
+-Send outgoing Mails Async - Done
   -read local emails to be sent
   -connect to provider
   -compile
   -send email
--Read SQL data Async
+-Read SQL data Async - Done
   -connect to sql
   -read data from sql to object
--Write SQL data Async
+-Write SQL data Async - Done
   -connect to sql
   -write from object to sql
 

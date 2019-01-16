@@ -14,6 +14,8 @@ lib_dir = -Llibraries
 
 
 LDFLAGS = -lrt -lm $(libs) $(lib_dir) $(sql_libs) $(boost_libs) 
+CXXFLAGS = -Wall -g
+#-O2 
 
 
 

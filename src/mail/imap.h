@@ -11,14 +11,14 @@ class Imap{
     void close();
     void hold();
     void resume();
-    bool read();
+    bool read(int index);
     bool debugging = false;
     void _accept();
     static void *pthread_created(void *);
   private:
     mailio::imaps* _connect();
     void _read(mailio::imaps*);
-    void _new_data(int);
+    bool _new_data(int);
     int last_message_index = 0;
     //control flags
     bool mail_reader_running = false;

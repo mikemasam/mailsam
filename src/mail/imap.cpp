@@ -4,6 +4,7 @@
 #include <mailio/message.hpp>
 #include <mailio/imap.hpp>
 #include <mailio/smtp.hpp>
+#include <mailio/mime.hpp>
 #include "imap.h"
 
 //using mailio::message;
@@ -18,7 +19,6 @@ Imap::Imap(std::string account_mail,std::string account_password,std::string ima
   this->account_password = account_password;
   this->imap_host = imap_host;
   this->imap_port = imap_port;
-  this->debugging = true;
   if(this->debugging)
       std::cout << "imap_host = " << this->imap_host << " imap_port" << this->imap_port << std::endl;
 }
@@ -61,15 +61,12 @@ void Imap::_accept(){
       std::cout << std::endl << "Connected;" << std::endl;
     mail_reader_running = true;
     this->_read(conn);
-
-    if(this->debugging)
-      std::cout << std::endl << "Connection closed;" << std::endl;
+    std::cout << std::endl << "Connection closed;" << std::endl;
 
     delete conn;
 
   }else{
-    if(this->debugging)
-      std::cout << std::endl << "Connection failed;" << std::endl;
+    std::cout << std::endl << "Connection failed;" << std::endl;
   }
 }
 
@@ -110,6 +107,7 @@ void Imap::_read(mailio::imaps *conn){
 
       if(this->last_message_index < 1){
         this->last_message_index = stat.messages_no;
+        std::cout << "new local index =" << this->last_message_index << std::endl;
       }
 
       if(index > this->last_message_index){
@@ -134,7 +132,7 @@ void Imap::_read(mailio::imaps *conn){
   } while(this->mail_reader_running);
 }
 
-void Imap::_new_data(int new_index){
+bool Imap::_new_data(int new_index){
   try{
     mailio::imaps *conn = new mailio::imaps(this->imap_host, this->imap_port);
     conn->authenticate(this->account_mail, this->account_password, mailio::imaps::auth_method_t::LOGIN);
@@ -142,16 +140,37 @@ void Imap::_new_data(int new_index){
     msg.line_policy(mailio::codec::line_len_policy_t::MANDATORY);
     conn->fetch("inbox", new_index, msg);
     std::cout << msg.subject() << std::endl;
-    std::string data = msg.content();
-    std::cout << "size of =" << sizeof(data) << std::endl;
-    msg.parse(data);
-    std::cout << data << std::endl;
+    //if(msg.content_type() == mailio::mime::media_type_t::MULTIPART){
+
+    //}else if(msg.content_type() == mailio::mime::media_type_t::TEXT){
+
+    //}
+
+    std::cout << "MULTIPART = " << (msg.content_type().type == mailio::mime::media_type_t::MULTIPART) << std::endl;
+
+    std::cout << "TEXT = " << (msg.content_type().type == mailio::mime::media_type_t::TEXT) << std::endl;
+
+    if(msg.content_type().type == mailio::mime::media_type_t::MULTIPART){
+      for (mailio::mime _msg: msg.parts()) {  
+        std::string data = _msg.content();
+        std::cout << data << std::endl;
+      }
+    }else if (msg.content_type().type == mailio::mime::media_type_t::TEXT){
+        std::string data = msg.content();
+        std::cout << data << std::endl;
+    }
     delete conn;
+    return true;
   }catch(std::exception& e){
     std::cout << e.what() << std::endl;
   }
+  return false;
 }
 
 void Imap::close(){
   this->mail_reader_running = false;
+}
+
+bool Imap::read(int index){
+  return this->_new_data(index);
 }

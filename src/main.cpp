@@ -1,6 +1,6 @@
 #include <iostream>
-#include "../options/options.h"
-#include "../mail/imap.h"
+#include "options/options.h"
+#include "mail/imap.h"
 #include <iomanip>
 
 using namespace std;
@@ -18,10 +18,16 @@ int main(int ac, char** av){
 
 void start_reader(){
   if(imap == NULL){
-    string a_m = "alltoall07@gmail.com";
-    string a_p = "meshack07";
+    std::cout << "Enter email:" << std::flush;
+    std::string email;
+    std::getline(std::cin, email);
+
+    std::cout << "Enter password:" << std::flush;
+    std::string password;
+    std::getline(std::cin, password);
+
     string imap_host = "imap.gmail.com";
-    imap = new Imap(a_m,a_p,imap_host);
+    imap = new Imap(email,password,imap_host);
   }
   imap->accept();
 }
@@ -33,6 +39,13 @@ void stop_reader(){
 
 void new_emails(){
 
+  if(imap != NULL){
+
+    std::cout << "Enter index:" << std::flush;
+    int index;
+    std::cin >> index;
+    imap->read(index);
+  }
 }
 
 

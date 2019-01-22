@@ -61,12 +61,14 @@ void Imap::_accept(){
       std::cout << std::endl << "Connected;" << std::endl;
     mail_reader_running = true;
     this->_read(conn);
-    std::cout << std::endl << "Connection closed;" << std::endl;
-
+    if(this->debugging)
+      std::cout << std::endl << "Connection closed;" << std::endl;
+    last_error = "Mail connection closed";
     delete conn;
-
   }else{
-    std::cout << std::endl << "Connection failed;" << std::endl;
+    last_error = "Mail connection failed";
+    if(this->debugging)
+      std::cout << std::endl << "Connection failed;" << std::endl;
   }
 }
 
@@ -125,6 +127,7 @@ void Imap::_read(mailio::imaps *conn){
       std::cout << e.what() << std::endl;
       if(no_stats_count > 5){
         this->mail_reader_running = false;
+        last_error = "Mail connection closed";
         break;
       }
     }
@@ -140,31 +143,28 @@ bool Imap::_new_data(int new_index){
     msg.line_policy(mailio::codec::line_len_policy_t::MANDATORY);
     conn->fetch("inbox", new_index, msg);
     std::cout << msg.subject() << std::endl;
-    //if(msg.content_type() == mailio::mime::media_type_t::MULTIPART){
+    mailio::mime _msg = (mailio::mime)msg;
+    std::cout << "Content = " << this->content(&_msg) << std::endl;
 
-    //}else if(msg.content_type() == mailio::mime::media_type_t::TEXT){
-
-    //}
-
-    std::cout << "MULTIPART = " << (msg.content_type().type == mailio::mime::media_type_t::MULTIPART) << std::endl;
-
-    std::cout << "TEXT = " << (msg.content_type().type == mailio::mime::media_type_t::TEXT) << std::endl;
-
-    if(msg.content_type().type == mailio::mime::media_type_t::MULTIPART){
-      for (mailio::mime _msg: msg.parts()) {  
-        std::string data = _msg.content();
-        std::cout << data << std::endl;
-      }
-    }else if (msg.content_type().type == mailio::mime::media_type_t::TEXT){
-        std::string data = msg.content();
-        std::cout << data << std::endl;
-    }
     delete conn;
     return true;
   }catch(std::exception& e){
     std::cout << e.what() << std::endl;
   }
   return false;
+}
+
+std::string Imap::content(mailio::mime *msg){
+  std::string _content = "";
+  if(msg->content_type().type == mailio::mime::media_type_t::MULTIPART){
+    for (mailio::mime _msg: msg->parts()) {
+      _content = _content + this->content(&_msg);
+    }
+  }
+  else if (msg->content_type().type == mailio::mime::media_type_t::TEXT){
+    _content = msg->content();
+  }
+  return _content;
 }
 
 void Imap::close(){
@@ -174,3 +174,8 @@ void Imap::close(){
 bool Imap::read(int index){
   return this->_new_data(index);
 }
+
+std::string Imap::getLastError(){
+  return last_error;
+}
+

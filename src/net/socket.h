@@ -1,7 +1,7 @@
 #include <string>
 #include <sys/socket.h>
 #include <netinet/in.h>
-
+#pragma once
 class Socket
 {
  public:
@@ -11,7 +11,7 @@ class Socket
   // Server initialization
   bool init(int max_connection_count = 10);
   bool server(int port);
-  bool acceptSocket ( Socket& );
+  Socket* acceptSocket ();
 
   // Client initialization
   bool client_connect(std::string host,int port);

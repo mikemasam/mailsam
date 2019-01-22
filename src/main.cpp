@@ -1,72 +1,17 @@
 #include <iostream>
-#include "options/options.h"
-#include "mail/imap.h"
+//#include "options/options.h"
 #include <iomanip>
+#include "core/core.h"
 
-using namespace std;
-
-string smtp_host = "smtp.gmail.com";
+std::string smtp_host = "smtp.gmail.com";
 int smtp_port = 587;
-Imap *imap;
-void terminal();
 
 int main(int ac, char** av){
-  terminal();
+  Core core;
+  core.init(9000);
   return 0;
 }
 
-
-void start_reader(){
-  if(imap == NULL){
-    std::cout << "Enter email:" << std::flush;
-    std::string email;
-    std::getline(std::cin, email);
-
-    std::cout << "Enter password:" << std::flush;
-    std::string password;
-    std::getline(std::cin, password);
-
-    string imap_host = "imap.gmail.com";
-    imap = new Imap(email,password,imap_host);
-  }
-  imap->accept();
-}
-
-void stop_reader(){
-  delete imap;
-}
-
-
-void new_emails(){
-
-  if(imap != NULL){
-
-    std::cout << "Enter index:" << std::flush;
-    int index;
-    std::cin >> index;
-    imap->read(index);
-  }
-}
-
-
-
-void terminal() {
-  while(true){
-    cout << "x:" << flush;
-    string s;
-    getline(std::cin, s);
-    if(s == "boot")
-      start_reader();
-    if(s == "stop")
-      stop_reader();
-    if(s == "read")
-      new_emails();
-    if(s == "q"){
-      stop_reader();
-      return;
-    }
-  }
-}
 
 /*
    Socket *soc = new Socket();

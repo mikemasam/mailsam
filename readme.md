@@ -31,3 +31,9 @@ Tasks Ranking
 ->Linux service flug library
 ->SQL library
 ->Mail Library
+
+Main
+  -read options and do the needful
+Core
+  -run terminal
+  -run mail handler

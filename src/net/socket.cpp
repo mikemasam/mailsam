@@ -4,12 +4,14 @@
 #include <string.h>
 #include <fcntl.h>
 #include <arpa/inet.h>
+#include "../core/utils.h"
 
 
 
 Socket::Socket() {
   this->m_sock = -1;
   memset(&this->m_addr,0,sizeof(this->m_addr));
+  //this->debugging = true;
 }
 
 Socket::~Socket(){
@@ -50,14 +52,16 @@ bool Socket::server(int port){
 
 
 
-bool Socket::acceptSocket (Socket& new_socket){
+Socket* Socket::acceptSocket (){
+  Socket *new_socket = new Socket();
   int addr_length = sizeof ( m_addr );
-  new_socket.m_sock = accept ( m_sock, ( sockaddr * ) &m_addr, ( socklen_t * ) &addr_length );
-
-  if ( new_socket.m_sock <= 0 )
-    return false;
+  new_socket->m_sock = accept ( m_sock, ( sockaddr * ) &m_addr, ( socklen_t * ) &addr_length );
+  if ( new_socket->m_sock <= 0 ){
+    delete new_socket;
+    return NULL;
+  }
   else
-    return true;
+    return new_socket;
 }
 
 
@@ -72,23 +76,25 @@ bool Socket::send_data(std::string s) {
 }
 
 
-bool Socket::recv_data(std::string& s) {
+bool Socket::recv_data(std::string& _s) {
   if(!is_valid())
     return false;
   char buf[this->max_recv];
   memset(buf, 0, this->max_recv);
   int status = this->max_recv;
+  std::string s = "";
 
   while(status >= this->max_recv){
     status = recv(m_sock, buf, this->max_recv, 0);
     s.append(buf, status);
     if(this->debugging)
-    std::cout << "buffer = " << buf << " , size " << status << std::endl;
+      std::cout << "buffer = " << buf << " , size " << status << std::endl;
     memset(buf, 0, this->max_recv);
   }
 
+  _s = Utils::removeCRLF(s);
   if(this->debugging)
-  std::cout << "end receiving" << std::endl;
+    std::cout << "end receiving" << std::endl;
   return status > 0;
 }
 
